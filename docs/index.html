@@ -4,61 +4,112 @@
     <meta charset="UTF-8">
     <title>chess</title>
     <style>
+        table {
+            border: 0;
+            border-collapse: collapse;
+        }
 
         td {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border: solid 1px #aaa;
             text-align: center;
-            line-height: 80px;
-            font-size: 60px;
+            line-height: 60px;
+            font-size: 50px;
         }
     </style>
 </head>
 <body>
-<table border="0" cellspacing="0" cellpadding="0">
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
+<div id="wrap"></div>
 <script>
-    window.onload = function () {
-        var table = document.getElementsByTagName('table')[0];
-        var isO= true;
-        table.onclick = function (ev) {
-            var ev = ev || window.event;
-            var target = ev.target || ev.srcElement;
+    var gridCount = 12;
+    var hookDom = document.getElementById('wrap');
+    var table;
+    var isO = false; // O 先开始
 
-            if (target.nodeName.toLowerCase() == 'td') {
-                isO =!isO;
-                var targetClicked = target.getAttribute('clicked');
-                if(targetClicked) return;
-                target.setAttribute('clicked',true)
-                target.innerText = (isO?"0":'x');
-                target.style.color = isO?'green':'red';
+    function createDom(num) {
+        var table = document.createElement('table');
+        for (var i = 0; i < gridCount; i++) {
+            var tr = document.createElement('tr');
+            for (var j = 0; j < gridCount; j++) {
+                var td = document.createElement('td');
+                tr.appendChild(td);
             }
+            table.appendChild(tr)
         }
+        return table;
+    }
+    function checkWin(table, x, y, isO) {
+        var testCount = 0;
+        var reg = new RegExp(isO ? /^0{5}$/ : /^x{5}$/)
+        // 判断横向胜数
+        for (var i = -5; i < 1; i++) {
+            var textArray = [];
+            for (var j = y + i; j < y + i + 5; j++) {
+                var text = table.children[x] && table.children[x].children[j] && table.children[x].children[j].innerHTML;
+                textArray.push(text)
+            }
+            testCount += reg.test(textArray.join(''));
+        }
+
+        // 判断竖向胜数
+        for (var i = -5; i < 1; i++) {
+            var textArray = [];
+            for (var j = y + i; j < y + i + 5; j++) {
+                var text = table.children[j] && table.children[j].children[y] && table.children[j].children[y].innerHTML;
+                textArray.push(text)
+            }
+            testCount += reg.test(textArray.join(''));
+        }
+        // 判断斜向胜数
+        for (var i = -4; i < 1; i++) {
+            var textArray = [];
+            for (var j = 0; j < 5; j++) {
+                var text = table.children[x + i + j] && table.children[x + i + j].children[y + i + j] && table.children[x + i + j].children[y + i + j].innerHTML;
+                textArray.push(text)
+            }
+            testCount += reg.test(textArray.join(''));
+        }
+        // 判断斜向胜数
+        for (var i = -4; i < 1; i++) {
+            var textArray = [];
+            for (var j = 0; j < 5; j++) {
+                var text = table.children[j - x - i] && table.children[j - x - i].children[y - i - j] && table.children[j - x - i].children[y - i - j].innerHTML;
+                textArray.push(text)
+            }
+            testCount += reg.test(textArray.join(''));
+        }
+        return testCount > 0
+    }
+    function getIndex(dom) {
+        var brothers = dom.parentNode.children;
+        return Array.prototype.slice.call(brothers).indexOf(dom)
+    }
+    function initDom() {
+        hookDom.innerHTML = '';
+        hookDom.appendChild(createDom(gridCount));
+        table = document.getElementsByTagName('table')[0];
+        table.onclick = handleClick
+    }
+    function handleClick(ev) {
+        var ev = ev || window.event;
+        var target = ev.target || ev.srcElement;
+
+        if (target.nodeName.toLowerCase() == 'td') {
+            var targetClicked = target.getAttribute('clicked');
+            if (targetClicked) return;
+            target.setAttribute('clicked', true)
+            target.innerText = (isO ? "0" : 'x');
+            target.style.color = isO ? 'green' : 'red';
+            if (checkWin(table, getIndex(target.parentNode), getIndex(target), isO)) {
+                alert((isO ? 'o' : 'x') + '胜了');
+                initDom();
+            }
+            isO = !isO;
+        }
+    }
+    window.onload = function () {
+        initDom();
     }
 </script>
 </body>
