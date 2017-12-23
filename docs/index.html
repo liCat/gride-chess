@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>chess</title>
+    <style>
+
+        td {
+            width: 80px;
+            height: 80px;
+            border: solid 1px #aaa;
+            text-align: center;
+            line-height: 80px;
+            font-size: 60px;
+        }
+    </style>
+</head>
+<body>
+<table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+<script>
+    window.onload = function () {
+        var table = document.getElementsByTagName('table')[0];
+        var isO= true;
+        table.onclick = function (ev) {
+            var ev = ev || window.event;
+            var target = ev.target || ev.srcElement;
+
+            if (target.nodeName.toLowerCase() == 'td') {
+                isO =!isO;
+                var targetClicked = target.getAttribute('clicked');
+                if(targetClicked) return;
+                target.setAttribute('clicked',true)
+                target.innerText = (isO?"0":'x');
+                target.style.color = isO?'green':'red';
+            }
+        }
+    }
+</script>
+</body>
+</html>
